@@ -1,25 +1,39 @@
 <?php
-/*
-Plugin Name: Post Type Switcher
-Plugin URI: http://wordpress.org/extend/post-type-switcher/
-Description: Allow switching of a post type in post publish area.
-Author: John James Jacoby
-Version: 0.3
-Author URI: http://johnjamesjacoby.com
-*/
+
+/**
+ * Post Type Switcher
+ *
+ * Allow switching of a post type while editing a post in post publish area
+ *
+ * @package PostTypeSwitcher
+ * @subpackage Main
+ */
+
+/**
+ * Plugin Name: Post Type Switcher
+ * Plugin URI:  http://wordpress.org/extend/post-type-switcher/
+ * Description: Allow switching of a post type while editing a post in post publish area
+ * Version:     1.0
+ * Author:      johnjamesjacoby
+ * Author URI:  http://johnjamesjacoby.com
+ */
+
+// Exit if accessed directly
+if ( !defined( 'ABSPATH' ) ) exit;
 
 /**
  * pts_metabox()
  *
  * Adds post_publish metabox to allow changing post_type
  *
+ * @since PostTypeSwitcher (0.3)
  * @global object $post Current post
  */
 function pts_metabox() {
 	global $post, $pagenow;
 
 	// Only show switcher when editing
-	if ( $pagenow == 'post-new.php' )
+	if ( ! in_array( $pagenow, pts_allowed_pages() ) )
 		return;
 
 	// Disallows things like attachments, revisions, etc...
@@ -73,11 +87,20 @@ function pts_metabox() {
 }
 add_action( 'post_submitbox_misc_actions', 'pts_metabox' );
 
+/**
+ * Set the post type on save_post but only when editing
+ *
+ * @since PostTypeSwitcher (0.3)
+ * @global string $pagenow
+ * @param int $post_id
+ * @param object $post
+ * @return If any number of condtions are met
+ */
 function pts_save_post( $post_id, $post ) {
 	global $pagenow;
 
 	// Only show switcher when editing
-	if ( $pagenow == 'post-new.php' )
+	if ( ! in_array( $pagenow, pts_allowed_pages() ) )
 		return;
 
 	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE )
@@ -106,35 +129,38 @@ function pts_save_post( $post_id, $post ) {
 add_action( 'save_post', 'pts_save_post', 10, 2 );
 
 /**
- * pts_head()
- *
  * Adds needed JS and CSS to admin header
+ *
+ * @since PostTypeSwitcher (0.3)
+ * @global string $pagenow
+ * @return If on post-new.php
  */
 function pts_head() {
 	global $pagenow;
 
 	// Only show switcher when editing
-	if ( $pagenow == 'post-new.php' )
+	if ( ! in_array( $pagenow, pts_allowed_pages() ) )
 		return; ?>
 
-	<script type='text/javascript'>
-		jQuery(document).ready(function($){
-			$('#edit-post-type-switcher').click( function() {
-				$(this).hide();
-				$('#post-type-select').slideDown();
+	<script type="text/javascript">
+		jQuery( document ).ready( function($) {
+			jQuery( '.misc-pub-section.curtime.misc-pub-section-last' ).removeClass( 'misc-pub-section-last' );
+			jQuery( '#edit-post-type-switcher' ).click( function(e) {
+				jQuery( this ).hide();
+				jQuery( '#post-type-select' ).slideDown();
 				e.preventDefault();
 			});
 
-			$('#save-post-type-switcher').click( function() {
-				$('#post-type-select').slideUp();
-				$('#edit-post-type-switcher').show();
-				$('#post-type-display').text( $('#pts_post_type :selected').text() );
+			jQuery( '#save-post-type-switcher' ).click( function(e) {
+				jQuery( '#post-type-select' ).slideUp();
+				jQuery( '#edit-post-type-switcher' ).show();
+				jQuery( '#post-type-display' ).text( jQuery( '#pts_post_type :selected' ).text() );
 				e.preventDefault();
 			});
 
-			$('#cancel-post-type-switcher').click( function() {
-				$('#post-type-select').slideUp();
-				$('#edit-post-type-switcher').show();
+			jQuery( '#cancel-post-type-switcher' ).click( function(e) {
+				jQuery( '#post-type-select' ).slideUp();
+				jQuery( '#edit-post-type-switcher' ).show();
 				e.preventDefault();
 			});
 		});
@@ -148,12 +174,22 @@ function pts_head() {
 		#post-type-display {
 			font-weight: bold;
 		}
-		div.post-type-switcher {
-			border-top: 1px solid #eee;
-		}
 	</style>
 <?php
 }
 add_action( 'admin_head', 'pts_head' );
+
+/**
+ * Return the allowed pages that $pagenow global can be
+ *
+ * @since PostTypeSwitcher (1.0)
+ */
+function pts_allowed_pages() {
+	$pages = array(
+		'post.php'
+	);
+
+	return $pages;
+}
 
 ?>

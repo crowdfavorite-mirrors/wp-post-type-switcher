@@ -2,8 +2,8 @@
 Contributors: johnjamesjacoby
 Tags: post type
 Requires at least: 3.0
-Tested up to: 3.0
-Stable tag: 0.2
+Tested up to: 3.3
+Stable tag: 1.0
 
 A simple way to change a post type in WordPress.
 
@@ -20,6 +20,11 @@ Post to Custom
 
 == Changelog ==
 
+= Version 1.0 =
+* Fix JS bugs
+* Audit post save bail conditions
+* Tweak UI for WordPress 3.3
+
 = Version 0.3 =
 * Use the API to change the post type, fixing a conflict with persistent object caches
 * No longer requires JavaScript
@@ -32,7 +37,7 @@ Post to Custom
 
 == Installation ==
 
-* Install the plugin into the plugins/post-type-swticher directory, and activate!
+* Install the plugin into the plugins/post-type-swticher directory, and activate.
 * From the post edit screen, above the "Publish" button is the "Post Type" interface.
 * Change post types as needed.
 
