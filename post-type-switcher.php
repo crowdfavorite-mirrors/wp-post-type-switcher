@@ -13,7 +13,7 @@
  * Plugin Name: Post Type Switcher
  * Plugin URI:  http://wordpress.org/extend/post-type-switcher/
  * Description: Allow switching of a post type while editing a post (in post publish section)
- * Version:     1.2
+ * Version:     1.3
  * Author:      johnjamesjacoby
  * Author URI:  http://johnjamesjacoby.com
  */
@@ -210,33 +210,39 @@ final class Post_Type_Switcher {
 	 * @param object $post
 	 * @return If any number of condtions are met
 	 */
-	function save_post( $post_id, $post ) {
+	public function save_post( $post_id, $post ) {
 
 		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
-			die( 'autosave' );
 			return;
 		}
 
-		if ( ! isset( $_REQUEST['pts-nonce-select'] ) )
+		if ( ! isset( $_REQUEST['pts-nonce-select'] ) ) {
 			return;
+		}
 
-		if ( ! wp_verify_nonce( $_REQUEST['pts-nonce-select'], 'post-type-selector' ) )
+		if ( ! wp_verify_nonce( $_REQUEST['pts-nonce-select'], 'post-type-selector' ) ) {
 			return;
+		}
 
-		if ( ! current_user_can( 'edit_post', $post_id ) )
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
 			return;
+		}
 
-		if ( empty( $_REQUEST['pts_post_type'] ) )
+		if ( empty( $_REQUEST['pts_post_type'] ) ) {
 			return;
+		}
 
-		if ( in_array( $post->post_type, array( $_REQUEST['pts_post_type'], 'revision' ) ) )
+		if ( in_array( $post->post_type, array( $_REQUEST['pts_post_type'], 'revision' ) ) ) {
 			return;
+		}
 
-		if ( ! $new_post_type_object = get_post_type_object( $_REQUEST['pts_post_type'] ) )
+		if ( ! $new_post_type_object = get_post_type_object( $_REQUEST['pts_post_type'] ) ) {
 			return;
+		}
 
-		if ( ! current_user_can( $new_post_type_object->cap->publish_posts ) )
+		if ( ! current_user_can( $new_post_type_object->cap->publish_posts ) ) {
 			return;
+		}
 
 		set_post_type( $post_id, $new_post_type_object->name );
 	}
@@ -247,7 +253,7 @@ final class Post_Type_Switcher {
 	 * @since PostTypeSwitcher (0.3)
 	 * @return If on post-new.php
 	 */
-	function admin_head() {
+	public function admin_head() {
 	?>
 
 		<script type="text/javascript">
@@ -281,6 +287,22 @@ final class Post_Type_Switcher {
 			}
 			#post-type-display {
 				font-weight: bold;
+			}
+			
+			#post-body .post-type-switcher::before {
+				content: '\f109';
+				font: 400 20px/1 dashicons;
+				speak: none;
+				display: inline-block;
+				padding: 0 2px 0 0;
+				top: 0;
+				left: -1px;
+				position: relative;
+				vertical-align: top;
+				-webkit-font-smoothing: antialiased;
+				-moz-osx-font-smoothing: grayscale;
+				text-decoration: none !important;
+				color: #888;
 			}
 		</style>
 
